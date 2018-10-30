@@ -1,0 +1,27 @@
+.css-cust {
+	position: relative;
+}
+.no-block {
+	display: inline;
+}
+.css-pointer:hover {
+	cursor: pointer;
+}
+.css-right-align {
+	position: relative;
+	left: 40px;
+}
+.list-people-show {
+	display: block;
+    position: absolute;
+    top: 50%;
+    left: 25%;
+    width: 40rem;
+    background: #ffffff;
+    height: 333px;
+    z-index: 1;
+    overflow: scroll;
+}
+.list-people-hide {
+	display: none;
+}
