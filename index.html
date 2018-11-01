@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -15,51 +15,84 @@
 	
 	<div class="form-group css-cust">
 		<div class="row">
-			<button class="btn btn-primary mr-3" v-on:click="peopleFlagShow = !peopleFlagShow">Участники</button>
+			<button id="id-btnPeopleLists" :class="{
+				'active': peopleFlagShow,
+				'btn': true,
+				'btn-primary': true,
+				'mr-3': true}" v-on:click="peopleFlagShow = !peopleFlagShow">Участники</button>
+			<button class="btn" v-on:click="insertPeople">Добавить участника</button>
 		</div>
-		<div :class="{
-			'list-people-show': peopleFlagShow === true,
-			'list-people-hide': peopleFlagShow === false
-			}">
-			<label for="sum">Участники</label>
-			<button type="button" class="close" aria-label="Close" v-on:click="peopleFlagShow = false">
-	          <span aria-hidden="true">&times;</span>
-	        </button>
-			<input type="text" class="form-control" id="people" placeholder="Участники...">
-			<ul class="list-group">
-				<li v-on:click="addPeople(people)"
-					:class="{
-							'list-group-item': true, 
-							'list-group-item-secondary': people.checked === false,
-							'list-group-item-success': people.checked === true
-						}" 
-					v-for="people in peoples" 					
-				>{{ people.name }}</li>
-			</ul>
+	<!-- Список участников -->
+		<div class="list-people">
+			<div id="id-divPeopleLists" :class="{
+				'list-people-show': peopleFlagShow === true,
+				'list-people-hide': peopleFlagShow === false
+				}">
+				<!-- <div class="row">
+							<button type="button" class="close" aria-label="Close" v-on:click="peopleFlagShow = false">
+									          <span aria-hidden="true">&times;</span>
+									        </button>
+						</div>		 -->		
+		        <div class="list-group-wrap">
+					<ul class="list-group">
+						<li v-on:click="addPeople(id)"
+							:class="{
+									'list-group-item': true, 
+									'list-group-item-secondary': id.checked === false,
+									'list-group-item-success': id.checked === true,
+									'css-pointer': true
+								}" 
+							v-for="(id) in peoples" 					
+						>{{ id.name }}</li>
+					</ul>
+				</div>
+			</div>
 		</div>
 		<label for="sum">Общая сумма</label>
 		<input v-model="sum" type="text" class="form-control" id="sum" placeholder="Общая сумма...">				
 	</div>
+<!-- Шапка таблицы расчетов -->
 	<div class="row">
-		<div class="col-md-2" v-for="title in titles">{{ title }}</div>
-	</div>
-	<!-- <div class="row" v-for="row in rows" v-if="">
-		
-	</div> -->
-	<div class="row" v-for="(row, i) in rows">
+		<div :class="{
+				'col-md-2': true,
+				'css-pointer': idx > 0 && idx < titles.length - 1
+				}" v-if="sum === 0" v-for="(title, idx) in titles" v-on:click="setAllV(idx)">{{ title }}</div>
+	</div>	
+<!-- Отоброжение с чекбоксами -->	
+	<div :class="{'row': true,
+				'results-hide': !!sum}" v-for="(row, i) in rows">
 		<div class="col-md-2" v-for="(value, idx) in row">
-			<p v-if="idx === 0" type="text" class="no-block css-pointer" v-on:click="setAll(i)">{{ row[idx] }}</p>
+			<p v-if="idx === 0" type="text" class="no-block css-pointer" v-on:click="setAll(i)">{{ peoples[ row[idx] ].name }}</p>
 			<input v-if="idx > 0 && idx < (row.length - 1)" type="checkbox" v-model="row[idx]" v-on:change="getHours" class="css-right-align">
 			<p v-if="idx === row.length - 1" type="text" class="no-block">{{ row[idx] | getCeil }}</p>
 		</div>
 	</div>
+<!-- Отоброжение без чекбоксов -->
+	<div :class="{'row': true,
+				'results-hide': !!!sum}" v-for="(row, i) in rows">
+		<div class="col-sm-2">
+			<p type="text" class="result-name">{{ peoples[ row[0] ].name }}</p>			
+		</div>
+		<div class="col-sm-1">			
+			<p type="text" class="result-sum">{{ row[row.length - 1] | getCeil }}</p>
+		</div>
+	</div>
+
 	<div class="row pt-3">
 		<button class="btn btn-primary mr-3" v-on:click="getOrder">Расчет</button>
 		<button class="btn btn-secondary" v-on:click="getClear">Сброс</button>
 	</div>
-	<div class="pt-5">SUMM - {{ sum }}</div>
-	<div class="pt-1">DATA - {{ rows }}</div>
-	<div class="pt-1">HOUR - {{ oHour }}</div>
+
+<!-- Форма новой записи -->
+	<div class="form-group css-cust">		
+		<label for="FIO">Банная погремуха</label>
+		<input v-model="newPeopleFIO" type="text" class="form-control" id="FIO" placeholder="Введите погремуху">		
+	</div>
+	
+	<div v-if="localhost === true" class="pt-5">SUMM - {{ sum }}</div>
+	<div v-if="localhost === true" class="pt-1">DATA - {{ rows }}</div>
+	<div v-if="localhost === true" class="pt-1">HOUR - {{ oHour }}</div>
+	
 </div>
 
 <script src="./lib/vue.js"></script>

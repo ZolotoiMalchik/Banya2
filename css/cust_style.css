@@ -11,17 +11,35 @@
 	position: relative;
 	left: 40px;
 }
+.list-people {
+	position: relative;
+}
 .list-people-show {
 	display: block;
     position: absolute;
-    top: 50%;
-    left: 25%;
-    width: 40rem;
+    top: 4px;
+    left: 0;
+    width: auto;
     background: #ffffff;
-    height: 333px;
-    z-index: 1;
-    overflow: scroll;
+    height: auto;
+    z-index: 1;    
+}
+.list-group-wrap {
+	height: 333px;
+	overflow-y: scroll;
 }
 .list-people-hide {
 	display: none;
+}
+.cust-btn-close {
+	display: block;
+}
+.results-hide {
+	display: none;
+}
+.result-name {
+	
+}
+.result-sum {
+
 }

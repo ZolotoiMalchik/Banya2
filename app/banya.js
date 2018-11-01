@@ -1,6 +1,10 @@
 /*
 *
 *
+статус текущих задач
+
+сделать отображение результатов: имя - сумма, без чекбоксов, отдельно, либо заместо экрана с чекбоксами
+сделать git репозиторий
 Добавить интервал посещения бани
 Добавить расчет времени по минутам
 Добавить профиль пользователей
@@ -29,7 +33,17 @@ let rows = [
 	["Dmitry A.",false, false, false, false, 0]
 ];
 
-const peoples = [
+const peoplesData = ["Ставровский Илья", "Гордеев Иван", "Прохоров Дмитрий", "Казанцев Николай", "Пустовойт Андрей", "Авсянкин Дмитрий", "Николаев Евгений", "Николаев Илья"];
+
+function People(oParams) {
+	this.name = oParams.name;
+	this.id = oParams.id;
+	this.row = oParams.row || [oParams.id, false, false, false, false, 0];
+	this.checked = oParams.checked || false;
+	this.idx = oParams.idx || -1;
+}
+
+/*const peoples = {
 	{name: "Ставровский Илья", id: "Ilya", row: ["Ilya",false, false, false, false, 0], checked: false, idx: -1},
 	{name: "Гордеев Иван", id: "Ivan", row: ["Ivan",false, false, false, false, 0], checked: false, idx: -1},
 	{name: "Прохоров Дмитрий", id: "Dmitry", row: ["Dmitry",false, false, false, false, 0], checked: false, idx: -1},
@@ -39,7 +53,12 @@ const peoples = [
 	{name: "Николаев Евгений", id: "Evgeny", row: ["Evgeny",false, false, false, false, 0], checked: false, idx: -1},
 	{name: "Николаев Илья", id: "Ilya", row: ["Ilya",false, false, false, false, 0], checked: false, idx: -1},
 
-];
+};*/
+let peoples = {};
+peoplesData.forEach(name => {
+	let id = +String(Math.random()).substr(2);
+	peoples[id] = new People({name: name, id: id});
+});
 
 
 new Vue({
@@ -49,34 +68,51 @@ new Vue({
 		peoples: peoples,
 		titles: titles,
 		sum: 0,
-		countPeople: rows.length,
+		countPeople: 0,
 		oHour: {},
 		costOneH: 1250,
-		peopleFlagShow: false
+		peopleFlagShow: false,
+		localhost: window.location.hostname === "localhost",
+		newPeopleFIO: ""
 	},
 	methods: {
-		addPeople(people) {
-			if (!people.checked) {
-				this.rows.push(people.row);
-				people.idx = this.rows.length - 1;
+		// Добавление нового участника
+		insertPeople() {
+			if (this.newPeopleFIO) {
+				let id = +String(Math.random()).substr(2);
+				peoples[id] = new People({name: this.newPeopleFIO, id: id});
+			}
+		},
+		// Добавление пользователей из списка в таблицу расчетов
+		addPeople(id) {
+			if (!id.checked) {
+				this.rows.push(id.row);
+				id.idx = this.rows.length - 1;
+				this.countPeople++;
 			} else {
-				this._setNewIdxs(people.idx);
-				this.rows.splice(people.idx, 1);
-				people.idx = -1;
+				this._setNewIdxs(id.idx);
+				this.rows.splice(id.idx, 1);
+				id.idx = -1;
+				this.countPeople--;
 			}
 
-			people.checked = !people.checked;			
+			id.checked = !id.checked;			
 			
 		},
 		_setNewIdxs(idx) {
 			var peoples = this.peoples;
-			peoples.forEach(prop => {
+			for (let id in peoples) {
+				if (peoples[id].idx > idx) {
+					peoples[id].idx--;
+				}
+			}
+			/*peoples.forEach(prop => {
 				
 					if (prop.idx  > idx) {
-						//console.log("DO", peoples.name, peoples.idx);
+						
 						prop.idx--;
-					}	//console.log("POSLE", peoples.name, peoples.idx);
-				});
+					}	
+				});*/
 			
 		},
 		getHours() {
@@ -113,6 +149,7 @@ new Vue({
 			/*this.rows.forEach((row, i) => {				
 					row[row.length-1] = 0;
 			});*/
+			console.log("ROWS", this.rows);
 			for (var i = 0; i < this.rows.length; i ++) {
 				var row = this.rows[i];
 				Vue.set(row, row.length - 1, 0);
@@ -138,7 +175,7 @@ new Vue({
 			}
 
 			this.sum = Math.ceil(result);
-			console.log("ROWS", rows);
+			//console.log("ROWS", rows);
 			//that.rows = rows;
 			/*изменение модели с итоговыми данными*/
 
@@ -149,7 +186,7 @@ new Vue({
 			this.sum = 0;
 			/*var oHour = this.oHour;*/
 
-			rows.forEach((row, i) => {
+			this.rows.forEach((row, i) => {
 				row.forEach((el, idx, arr) => {
 					if (idx > 0 && idx < (arr.length - 1)) {
 						Vue.set(row, idx, false);													
@@ -163,6 +200,15 @@ new Vue({
 			row.forEach((el, idx, arr) => {
 				if (idx > 0 && idx < (arr.length - 1)) {
 					Vue.set(row, idx, true);													
+				}
+			});
+			this.getHours();
+		},
+		setAllV(i) {
+			var rows = this.rows;
+			rows.forEach((row, idx, arr) => {
+				if (i > 0 && i < (row.length - 1)) {
+					Vue.set(row, i, true);													
 				}
 			});
 			this.getHours();
