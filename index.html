@@ -84,10 +84,7 @@
 	</div>
 
 <!-- Форма новой записи -->
-	<div class="form-group css-cust">		
-		<label for="FIO">Банная погремуха</label>
-		<input v-model="newPeopleFIO" type="text" class="form-control" id="FIO" placeholder="Введите погремуху">		
-	</div>
+	<app-newuserform v-bind="newPeopleFIO"></app-newuserform>
 	
 	<div v-if="localhost === true" class="pt-5">SUMM - {{ sum }}</div>
 	<div v-if="localhost === true" class="pt-1">DATA - {{ rows }}</div>

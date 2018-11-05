@@ -13,6 +13,8 @@
 *
 *
 */
+//import Vue from 'vue'
+//import NewUserForm from '../components/NewUser.vue'
 
 
 const titles = ["Имя", "20:00 - 21:00", "21:00 - 22:00", "22:00 - 23:00", "23:00 - 24:00", "Итог"];
@@ -61,7 +63,17 @@ peoplesData.forEach(name => {
 });
 
 
-new Vue({
+Vue.component('app-newuserform', {
+	data() {
+		return {newPeopleFIO: vm.newPeopleFIO}
+	},
+	template: `<div class="form-group newuserform">		
+		<label for="FIO">Банная погремуха</label>
+		<input v-model="newPeopleFIO" type="text" class="form-control" id="FIO" placeholder="Введите погремуху">		
+	</div>`
+});
+
+let vm = new Vue({
 	el: '#banya',
 	data: {
 		rows: [],
