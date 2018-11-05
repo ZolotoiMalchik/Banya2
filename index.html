@@ -11,7 +11,7 @@
 <body class="body">
 
 <!-- BANYA -->
-<div class="container pt-5" id="banya">
+<div class="container pt-5" id="banya" v-on:click="onMainCnt">
 	
 	<div class="form-group css-cust">
 		<div class="row">
@@ -19,7 +19,7 @@
 				'active': peopleFlagShow,
 				'btn': true,
 				'btn-primary': true,
-				'mr-3': true}" v-on:click="peopleFlagShow = !peopleFlagShow">Участники</button>
+				'mr-3': true}">Участники</button>
 			<button class="btn" v-on:click="insertPeople">Добавить участника</button>
 		</div>
 	<!-- Список участников -->

@@ -76,6 +76,18 @@ new Vue({
 		newPeopleFIO: ""
 	},
 	methods: {
+		onMainCnt(e) {
+			console.log("main click");
+			var trg = e.target;
+			var parentLiPeople = trg.closest("div[id='id-divPeopleLists']");
+			if (!parentLiPeople && trg.id !== "id-btnPeopleLists" && this.peopleFlagShow) {
+				this.peopleFlagShow = false;
+			}
+			if (trg.id === "id-btnPeopleLists") {
+				this.peopleFlagShow = !this.peopleFlagShow;
+			}
+			
+		},
 		// Добавление нового участника
 		insertPeople() {
 			if (this.newPeopleFIO) {
