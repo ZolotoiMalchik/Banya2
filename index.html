@@ -11,7 +11,7 @@
 <body class="body">
 
 <!-- BANYA -->
-<div class="container pt-5" id="banya">
+<div class="container pt-5" id="banya" v-on:click="onMainCnt">
 	
 	<div class="form-group css-cust">
 		<div class="row">
@@ -19,8 +19,12 @@
 				'active': peopleFlagShow,
 				'btn': true,
 				'btn-primary': true,
-				'mr-3': true}" v-on:click="peopleFlagShow = !peopleFlagShow">Участники</button>
-			<button class="btn" v-on:click="insertPeople">Добавить участника</button>
+				'mr-3': true}">Участники</button>
+			<button id="id-btnAddPeople" :class="{
+				'active': newPeopleFlagShow,
+				'btn': true,
+				'btn-primary': true,
+				'mr-3': true}" v-on:click="toggleNewUserForm">+</button>			
 		</div>
 	<!-- Список участников -->
 		<div class="list-people">
@@ -47,6 +51,8 @@
 					</ul>
 				</div>
 			</div>
+	<!-- Форма новой записи -->
+			<app-newuserform v-bind:showform="newPeopleFlagShow" v-on:insert-people="insertPeople"></app-newuserform>
 		</div>
 		<label for="sum">Общая сумма</label>
 		<input v-model="sum" type="text" class="form-control" id="sum" placeholder="Общая сумма...">				
@@ -81,12 +87,6 @@
 	<div class="row pt-3">
 		<button class="btn btn-primary mr-3" v-on:click="getOrder">Расчет</button>
 		<button class="btn btn-secondary" v-on:click="getClear">Сброс</button>
-	</div>
-
-<!-- Форма новой записи -->
-	<div class="form-group css-cust">		
-		<label for="FIO">Банная погремуха</label>
-		<input v-model="newPeopleFIO" type="text" class="form-control" id="FIO" placeholder="Введите погремуху">		
 	</div>
 	
 	<div v-if="localhost === true" class="pt-5">SUMM - {{ sum }}</div>

@@ -13,6 +13,8 @@
 *
 *
 */
+//import Vue from 'vue'
+//import NewUserForm from '../components/NewUser.vue'
 
 
 const titles = ["Имя", "20:00 - 21:00", "21:00 - 22:00", "22:00 - 23:00", "23:00 - 24:00", "Итог"];
@@ -61,7 +63,21 @@ peoplesData.forEach(name => {
 });
 
 
-new Vue({
+Vue.component('app-newuserform', {
+	data() {
+		console.log("C DATA", this);
+		return { 
+			newfio: ""}
+	},
+	props: ['showform'],
+	template: `<div class="form-group" :class="{'hide': !showform, 'new-user-form': showform}">			
+		<label class="new-user-form__lbl" for="FIO">Банная погремуха</label>
+		<input v-model="newfio" type="text" class="form-control" id="FIO" placeholder="Введите погремуху">
+		<button class="new-user-form__btn--insert" v-on:click="$emit('insert-people', newfio)">Добавить участника</button>
+	</div>`
+});
+
+let vm = new Vue({
 	el: '#banya',
 	data: {
 		rows: [],
@@ -73,14 +89,32 @@ new Vue({
 		costOneH: 1250,
 		peopleFlagShow: false,
 		localhost: window.location.hostname === "localhost",
-		newPeopleFIO: ""
+		newPeopleFlagShow: false
 	},
 	methods: {
+		toggleNewUserForm() {
+			this.newPeopleFlagShow = !this.newPeopleFlagShow;
+			//console.log("newPeopleFlagShow", this.newPeopleFlagShow);
+		},
+		onMainCnt(e) {
+			console.log("main click");
+			var trg = e.target;
+			var parentLiPeople = trg.closest("div[id='id-divPeopleLists']");
+			if (!parentLiPeople && trg.id !== "id-btnPeopleLists" && this.peopleFlagShow) {
+				this.peopleFlagShow = false;
+			}
+			if (trg.id === "id-btnPeopleLists") {
+				this.peopleFlagShow = !this.peopleFlagShow;
+			}
+			
+		},
 		// Добавление нового участника
-		insertPeople() {
-			if (this.newPeopleFIO) {
+		insertPeople(newPeopleFIO) {
+			console.log("Insert people", newPeopleFIO);
+			if (newPeopleFIO) {
 				let id = +String(Math.random()).substr(2);
-				peoples[id] = new People({name: this.newPeopleFIO, id: id});
+				peoples[id] = new People({name: newPeopleFIO, id: id});
+				this.newPeopleFlagShow = false;
 			}
 		},
 		// Добавление пользователей из списка в таблицу расчетов

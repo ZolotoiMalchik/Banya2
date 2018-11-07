@@ -43,3 +43,65 @@
 .result-sum {
 
 }
+
+.hide {
+	display: none;
+}
+.new-user-form {
+	display: block;
+    position: absolute;
+    top: 4px;
+    left: 0;
+    width: auto;
+    background: #8673e8;
+    height: auto;
+    z-index: 1;
+    padding: 19px 15px;
+    border-radius: 5px;
+    box-shadow: 0 3px 20px 0 #8673e8;
+}
+
+.new-user-form__lbl {
+	color: #fff;
+}
+.new-user-form__btn--insert {
+	display: block;
+    border: 1px solid #9ae69a;
+    background: #9ae69a;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    float: right;
+}
+.btn--active {
+	display: block;
+    border: 4px solid #d5efd5;
+    background: #9ae69a;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.new-user-form__btn--insert:hover {
+	display: block;
+    border: 1px solid #9ae69a;
+    background: #5DA160;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    float: right;
+}
+
+@media screen and (max-width: 450px) {
+	.new-user-form {
+		display: block;
+	    position: absolute;
+	    top: 4px;
+	    left: 0;
+	    width: 100%;
+	    background: #8673e8;
+	    height: auto;
+	    z-index: 1;
+	    padding: 19px 15px;
+	    border-radius: 5px;
+	    box-shadow: 0 3px 20px 0 #8673e8;
+	}
+}
