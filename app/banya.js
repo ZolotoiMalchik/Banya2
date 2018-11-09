@@ -1,4 +1,4 @@
-﻿/*
+/*
 *
 *
 статус текущих задач
@@ -74,6 +74,160 @@ Vue.component('app-newuserform', {
 		<label class="new-user-form__lbl" for="FIO">Банная погремуха</label>
 		<input v-model="newfio" type="text" class="form-control" id="FIO" placeholder="Введите погремуху">
 		<button class="new-user-form__btn--insert" v-on:click="$emit('insert-people', newfio)">Добавить участника</button>
+	</div>`
+});
+
+Vue.component('app-slider', {
+	data: function() {
+		console.log("APP-SLIDER");
+		let date = new Date();
+		let dateEnd = new Date();
+		//let oBtn = this.$el.querySelector(".slider__btn");
+
+		return {
+			btnStart: {
+				xClient: 0,
+				dClient: 0,
+				cClient: 0,
+				hour: 20,
+				date: date,
+				startMs: date.setHours(20, 0, 0),
+				oBtn: null,
+				dBtn: 0,
+				oSliderCount: null,
+					styleObj: {
+					left: ''
+				}
+			},
+			btnEnd: {
+				xClient: 0,
+				dClient: 0,
+				cClient: 0,
+				hour: 20,
+				date: dateEnd,
+				startMs: dateEnd.setHours(24, 0, 0),
+				oBtn: null,
+				dBtn: 0,
+				oSliderCount: null,
+				styleObj: {
+					left: '225px'
+				}
+			},				
+			moveEventFlag: false,
+			btnFlag: 0,
+			bgLineStyle: {
+				width: "100%",
+				left: "0"
+			},
+		}
+	},
+	props: ['params'],
+	created: function() {
+		console.log("Created");
+	},
+	mounted: function() {
+
+		this.$data.oBgLineOut = this.$el.querySelector('.slider__br-line--out');
+		this.$data.oBgLine = this.$el.querySelector('.slider__br-line');		
+		this.$data.btnStart.oBtn = this.$el.querySelector('.slider__btn');
+		this.$data.btnStart.oSliderCount = this.$el.querySelector('.slider__count');
+		this.$data.btnStart.dBtn = parseInt(getComputedStyle(this.$data.btnStart.oBtn).width, 10)/2;
+		this.$data.btnStart.styleObj.left = "-" + this.$data.btnStart.dBtn + "px";
+		this.$data.btnStart.xClient = this.$data.btnStart.oBtn.getClientRects()[0].x;
+
+		this.$data.btnEnd.oBtn = this.$el.querySelector('.slider__btn-end');
+		this.$data.btnEnd.oSliderCount = this.$el.querySelector('.slider__count-end');
+		this.$data.btnEnd.dBtn = parseInt(getComputedStyle(this.$data.btnEnd.oBtn).width, 10)/2;
+		//this.$data.btnEnd.styleObj.left = "225px";
+		this.$data.btnEnd.xClient = this.$data.btnStart.oBtn.getClientRects()[0].x;
+		this.$data.btnEnd.cClient = this.$data.btnEnd.oBtn.getClientRects()[0].x;
+		this.$data.btnEnd.dClient = this.$data.btnEnd.cClient - this.$data.btnEnd.xClient;
+
+		console.log("Mounted");
+	},
+	methods: {
+		sliderMDown(btn) {
+			this.moveEventFlag = true;
+			this.btnFlag = btn;
+			//this[this.btnFlag].xClient === 0 && (this[this.btnFlag].xClient = this["btnStart"].oBtn.getClientRects()[0].x);
+		},
+		sliderMUp(btn) {
+			this.moveEventFlag = false;
+			this.btnFlag = btn;
+		},
+		sliderMLeave(btn) {
+			this.moveEventFlag = false;
+			this.btnFlag = btn;
+		},
+		sliderMMove: function(e) {
+			if (!this.moveEventFlag) return;					
+				
+				var microDelta = -this[this.btnFlag].dBtn;
+				var max = parseInt(getComputedStyle(this.$el).width, 10);
+				var cBgLineWidth, cBgLineLeft;
+
+				if (e.changedTouches) {
+					this[this.btnFlag].cClient = e.changedTouches[0].clientX;
+				} else {
+					this[this.btnFlag].cClient = e.clientX;	
+				}				
+
+			//if (dClient < (cClient - xClient)) microDelta = -microDelta;
+				this[this.btnFlag].dClient = this[this.btnFlag].cClient - this[this.btnFlag].xClient;
+				/*console.log("COORDS xClient", this[this.btnFlag].xClient);
+				console.log("COORDS dClient", this[this.btnFlag].dClient);
+				console.log("COORDS cClient", this[this.btnFlag].cClient);*/
+
+				if (this[this.btnFlag].dClient < 0) {
+					this[this.btnFlag].dClient = 0;
+					this[this.btnFlag].styleObj.left = "-" + this[this.btnFlag].dBtn + "px";
+				} else if (this[this.btnFlag].dClient >= 240) {
+					this[this.btnFlag].dClient = 240;
+					this[this.btnFlag].styleObj.left = "225px";
+				} else {
+					this[this.btnFlag].styleObj.left = this[this.btnFlag].dClient + microDelta + "px";
+				}
+
+
+				if (this.btnFlag === 'btnStart') {
+					timeMs = this[this.btnFlag].startMs + this[this.btnFlag].dClient * 60 * 1000;
+				} else {
+					timeMs = this[this.btnFlag].startMs - (240 - this[this.btnFlag].dClient) * 60 * 1000;
+				}
+
+				this[this.btnFlag].date.setTime(timeMs);
+				this[this.btnFlag].oSliderCount = this[this.btnFlag].date.toLocaleString().split(" ")[1].substr(0,5);
+
+				cBgLineWidth = this.btnEnd.dClient - this.btnStart.dClient;				
+				this.bgLineStyle.width = cBgLineWidth + "px";
+				this.bgLineStyle.left = this.btnStart.dClient + "px";	
+
+				console.log("BG LINE Width", cBgLineWidth);
+				console.log("BG LINE Left", cBgLineLeft);				
+		}
+	},
+	template: `
+		<div class="slider" v-on:mousemove="sliderMMove"
+							v-on:touchmove="sliderMMove">
+		<div class="slider__count">{{ btnStart.date.toLocaleString().split(" ")[1].substr(0,5) }}</div>
+		<div class="slider__count-end">{{ btnEnd.date.toLocaleString().split(" ")[1].substr(0,5) }}</div>
+		<div class="slider__bg-line--out"></div>
+		<div class="slider__bg-line" v-bind:style="bgLineStyle"></div>		
+		<button class="slider__btn" v-bind:style="btnStart.styleObj"
+				v-on:mousedown="sliderMDown('btnStart')"
+				v-on:mouseup="sliderMUp('btnStart')"
+				v-on:mouseleave="sliderMLeave('btnStart')"
+				v-on:touchstart="sliderMDown('btnStart')"
+				v-on:touchend="sliderMUp('btnStart')"
+				v-on:touchcancel="sliderMLeave('btnStart')"></button>
+		<button class="slider__btn-end" v-bind:style="btnEnd.styleObj"
+				v-on:mousedown="sliderMDown('btnEnd')"
+				v-on:mouseup="sliderMUp('btnEnd')"
+				v-on:mouseleave="sliderMLeave('btnEnd')"
+				v-on:touchstart="sliderMDown('btnEnd')"
+				v-on:touchend="sliderMUp('btnEnd')"
+				v-on:touchcancel="sliderMLeave('btnEnd')"></button>
+		<div class="slider__user-name">{{ params.name }}</div>
 	</div>`
 });
 
@@ -232,8 +386,8 @@ let vm = new Vue({
 		setAll(i) {
 			var row = this.rows[i];
 			row.forEach((el, idx, arr) => {
-				if (idx > 0 && idx < (arr.length - 1)) {
-					Vue.set(row, idx, true);													
+				if (idx > 0 && idx < (arr.length - 1)) {					
+					Vue.set(row, idx, !el);													
 				}
 			});
 			this.getHours();
@@ -242,7 +396,7 @@ let vm = new Vue({
 			var rows = this.rows;
 			rows.forEach((row, idx, arr) => {
 				if (i > 0 && i < (row.length - 1)) {
-					Vue.set(row, i, true);													
+					Vue.set(row, i, !row[i]);													
 				}
 			});
 			this.getHours();
@@ -254,3 +408,8 @@ let vm = new Vue({
 		}
 	}
 });
+
+
+var Slider = (function(g, doc) {
+
+})(window, document);

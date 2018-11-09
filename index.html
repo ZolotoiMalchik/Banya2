@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -42,7 +42,7 @@
 						<li v-on:click="addPeople(id)"
 							:class="{
 									'list-group-item': true, 
-									'list-group-item-secondary': id.checked === false,
+									'list-group-item-primary': id.checked === false,
 									'list-group-item-success': id.checked === true,
 									'css-pointer': true
 								}" 
@@ -72,6 +72,7 @@
 			<input v-if="idx > 0 && idx < (row.length - 1)" type="checkbox" v-model="row[idx]" v-on:change="getHours" class="css-right-align">
 			<p v-if="idx === row.length - 1" type="text" class="no-block">{{ row[idx] | getCeil }}</p>
 		</div>
+		<app-slider v-bind:params="peoples[ row[0] ]"></app-slider>
 	</div>
 <!-- Отоброжение без чекбоксов -->
 	<div :class="{'row': true,
@@ -88,6 +89,15 @@
 		<button class="btn btn-primary mr-3" v-on:click="getOrder">Расчет</button>
 		<button class="btn btn-secondary" v-on:click="getClear">Сброс</button>
 	</div>
+
+	<!-- <app-slider></app-slider>
+	<app-slider></app-slider> -->
+
+	<!-- <div class="slider">
+		<div class="slider__count"></div>
+		<div class="slider__bg-line"></div>
+		<button class="slider__btn"></button>
+	</div> -->
 	
 	<div v-if="localhost === true" class="pt-5">SUMM - {{ sum }}</div>
 	<div v-if="localhost === true" class="pt-1">DATA - {{ rows }}</div>

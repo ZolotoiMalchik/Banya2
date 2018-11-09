@@ -52,7 +52,7 @@
     position: absolute;
     top: 4px;
     left: 0;
-    width: auto;
+    width: 400px;
     background: #8673e8;
     height: auto;
     z-index: 1;
@@ -88,6 +88,71 @@
     cursor: pointer;
     margin-top: 10px;
     float: right;
+}
+
+.slider {
+	position: relative;
+    width: 240px;
+    height: 100px;
+    background: #9ae69a;
+    box-shadow: 4px 4px 8px 0px #b9ceb9;
+    margin: 10px;
+    border-radius: 5px;
+}
+.slider__bg-line {
+	position: absolute;
+    background: #2d90b1;
+    height: 4px;
+    width: 100%;
+    top: 50%;
+}
+.slider__bg-line--out {
+	position: absolute;
+    background: #fff;
+    height: 4px;
+    width: 100%;
+    top: 50%;	
+}
+.slider__btn {
+	position: absolute;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #2d90b1;
+    border: 1px solid #2d90b1;
+    cursor: pointer;
+    top: 39%;
+    /* left: 0; */
+}
+.slider__btn-end {
+	position: absolute;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #B34D4B;
+    border: 1px solid #B34D4B;
+    cursor: pointer;
+    top: 39%;
+    /* left: 100%; */
+}
+.slider__count {
+	/* display: inline; */
+	/* width: 50%;
+	height: 40px; */
+	position: absolute;
+	left: 0;
+}
+.slider__count-end {
+	/* display: inline; */
+	/* width: 50%;
+	height: 40px; */
+	position: absolute;
+	right: 0;
+}
+.slider__user-name {
+	position: absolute;
+	bottom: 0;
+	color: #4f8a3c;
 }
 
 @media screen and (max-width: 450px) {
