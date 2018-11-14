@@ -13,18 +13,29 @@
 <!-- BANYA -->
 <div class="container pt-5" id="banya" v-on:click="onMainCnt">
 	
+	<!-- Заголовок приложения -->
+	<div class="app__title">
+		<div class="bg-title">Баня</div>
+		<div class="front-title">Баня</div>
+	</div>
+	
 	<div class="form-group css-cust">
+		<label for="hourPrice" :class="{'hide': !!sum}">Стоимость за час в рублях</label>
+		<input v-model="hourPrice" type="text" class="form-control mb-2" :class="{'hide': !!sum}" id="hourPrice" placeholder="Стоимость за час в рублях...">
 		<div class="row">
 			<button id="id-btnPeopleLists" :class="{
 				'active': peopleFlagShow,
 				'btn': true,
 				'btn-primary': true,
-				'mr-3': true}">Участники</button>
+				'mr-3': true,
+				'ml-3': true,
+				'hide': !!sum}">Участники</button>
 			<button id="id-btnAddPeople" :class="{
 				'active': newPeopleFlagShow,
 				'btn': true,
 				'btn-primary': true,
-				'mr-3': true}" v-on:click="toggleNewUserForm">+</button>			
+				'mr-3': true,
+				'hide': !!sum}" v-on:click="toggleNewUserForm">+</button>			
 		</div>
 	<!-- Список участников -->
 		<div class="list-people">
@@ -51,21 +62,36 @@
 					</ul>
 				</div>
 			</div>
-	<!-- Форма новой записи -->
+	<!----Старая версия - Форма новой записи -->
 			<app-newuserform v-bind:showform="newPeopleFlagShow" v-on:insert-people="insertPeople"></app-newuserform>
 		</div>
-		<label for="sum">Общая сумма</label>
-		<input v-model="sum" type="text" class="form-control" id="sum" placeholder="Общая сумма...">				
+		<label for="sum" class="hide">Общая сумма</label>
+		<input v-model="sum" type="text" class="form-control hide" id="sum" placeholder="Общая сумма...">
+	<!-- Заголовок сводной таблицы -->
+		<div class="results__row" :class="{'hide': !!!sum}">
+		<!-- Стоимость за час -->
+			<div class="results__cell-name">Стоимость за час: </div>
+			<div class="results__cell-sum">{{hourPrice}}</div>
+			<div class="results__cell-rub">
+				<span class="rub">&#8381</span>
+			</div>
+		<!-- Итоговая сумма -->
+			<div class="results__cell-name">Общая сумма: </div>
+			<div class="results__cell-sum">{{sum}}</div>
+			<div class="results__cell-rub">
+				<span class="rub">&#8381</span>
+			</div>		
+		</div>				
 	</div>
-<!-- Шапка таблицы расчетов -->
-	<div class="row">
+<!--Старая версия -  Шапка таблицы расчетов -->
+	<div class="row hide">
 		<div :class="{
 				'col-md-2': true,
 				'css-pointer': idx > 0 && idx < titles.length - 1
 				}" v-if="sum === 0" v-for="(title, idx) in titles" v-on:click="setAllV(idx)">{{ title }}</div>
 	</div>	
-<!-- Отоброжение с чекбоксами -->	
-	<div :class="{'row': true,
+<!--Старая версия - Отоброжение с чекбоксами -->	
+	<div class="hide" :class="{'row': true,
 				'results-hide': !!sum}" v-for="(row, i) in rows">
 		<div class="col-md-2" v-for="(value, idx) in row">
 			<p v-if="idx === 0" type="text" class="no-block css-pointer" v-on:click="setAll(i)">{{ peoples[ row[idx] ].name }}</p>
@@ -74,8 +100,25 @@
 		</div>
 		<app-slider v-bind:params="peoples[ row[0] ]"></app-slider>
 	</div>
-<!-- Отоброжение без чекбоксов -->
-	<div :class="{'row': true,
+
+<!-- Отображение панелей с параметрами -->
+	<div :class="{'hide': !!sum}" v-for="user in peoples">
+		<app-slider v-if="~user.idx" v-bind:params="user"></app-slider>
+	</div>
+
+	<div :class="{'hide': !!!sum}" v-for="user in peoples">
+		<div v-if="~user.idx" class="results__row">
+			<div class="results__cell-name">{{user.name}}</div>
+			<div class="results__cell-sum">{{user.sum}}</div>
+			<div class="results__cell-rub">
+				<span class="rub">&#8381</span>
+			</div>
+			<div class="results__cell-status">Банный статус: {{getStatus(user.interval)}}</div>
+		</div>
+	</div>
+
+<!--Старая версия - Отоброжение без чекбоксов -->
+	<div class="hide" :class="{'row': true,
 				'results-hide': !!!sum}" v-for="(row, i) in rows">
 		<div class="col-sm-2">
 			<p type="text" class="result-name">{{ peoples[ row[0] ].name }}</p>			
@@ -86,8 +129,8 @@
 	</div>
 
 	<div class="row pt-3">
-		<button class="btn btn-primary mr-3" v-on:click="getOrder">Расчет</button>
-		<button class="btn btn-secondary" v-on:click="getClear">Сброс</button>
+		<button class="btn btn-primary mr-3 ml-3" :class="{'hide': !!sum}" v-on:click="getOrder">Расчет</button>
+		<button class="btn btn-secondary mr-3 ml-3" :class="{'hide': !!!sum}" v-on:click="getClear">Сброс</button>
 	</div>
 
 	<!-- <app-slider></app-slider>
@@ -102,6 +145,7 @@
 	<div v-if="localhost === true" class="pt-5">SUMM - {{ sum }}</div>
 	<div v-if="localhost === true" class="pt-1">DATA - {{ rows }}</div>
 	<div v-if="localhost === true" class="pt-1">HOUR - {{ oHour }}</div>
+	<div v-if="localhost === true" class="pt-1">Peoples - {{ peoples }}</div>
 	
 </div>
 

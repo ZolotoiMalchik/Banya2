@@ -35,20 +35,17 @@ let rows = [
 	["Dmitry A.",false, false, false, false, 0]
 ];
 
-const peoplesData = ["Ставровский Илья", "Гордеев Иван", "Прохоров Дмитрий", "Казанцев Николай", "Пустовойт Андрей", "Авсянкин Дмитрий", "Николаев Евгений", "Николаев Илья"].sort();
+const peoplesData = ["Ставровский Илья", "Гордеев Иван", "Прохоров Дмитрий", "Казанцев Николай", "Пустовойт Андрей", "Авсянкин Дмитрий", "Николаев Евгений", "Николаев Илья"];
 
 function People(oParams) {
-	var d1 = new Date().setHours(20, 0, 0);
-	var d2 = new Date().setHours(24, 0, 0);
 	this.name = oParams.name;
 	this.id = oParams.id;
 	this.row = oParams.row || [oParams.id, false, false, false, false, 0];
 	this.checked = oParams.checked || false;
 	this.idx = oParams.idx || -1;
-	this.dateStart = parseInt(d1.toString().substr(0,9) + "0000", 10)/*new Date().setHours(20, 0, 0)*/;
-	this.dateEnd = parseInt(d2.toString().substr(0,9) + "0000", 10)/*new Date().setHours(24, 0, 0)*/;
+	this.dateStart = new Date().setHours(20, 0, 0);
+	this.dateEnd = new Date().setHours(24, 0, 0);
 	this.interval = (this.dateEnd - this.dateStart)/1000/60 - 60 // в минутах;
-	this.sum = 0;
 }
 
 /*const peoples = {
@@ -86,8 +83,8 @@ Vue.component('app-newuserform', {
 Vue.component('app-slider', {
 	data: function() {
 		console.log("APP-SLIDER");
-		let date = new Date();
-		let dateEnd = new Date();
+		//let date = new Date();
+		//let dateEnd = new Date();
 		//let oBtn = this.$el.querySelector(".slider__btn");
 
 		return {
@@ -116,7 +113,7 @@ Vue.component('app-slider', {
 				dBtn: 0,
 				oSliderCount: null,
 				styleObj: {
-					left: '227.5px'
+					left: '225px'
 				}
 			},				
 			moveEventFlag: false,
@@ -137,129 +134,115 @@ Vue.component('app-slider', {
 	},
 	mounted: function() {
 
-		if (!this.$el.getClientRects()[0]) return;
-
 		this.$data.oBgLineOut = this.$el.querySelector('.slider__br-line--out');
 		this.$data.oBgLine = this.$el.querySelector('.slider__br-line');		
 		this.$data.btnStart.oBtn = this.$el.querySelector('.slider__btn');
 		this.$data.btnStart.oSliderCount = this.$el.querySelector('.slider__count');
 		this.$data.btnStart.dBtn = parseInt(getComputedStyle(this.$data.btnStart.oBtn).width, 10)/2;
 		this.$data.btnStart.styleObj.left = "-" + this.$data.btnStart.dBtn + "px";
-		this.$data.btnStart.xClient = this.$el.getClientRects()[0].x;
+		this.$data.btnStart.xClient = this.$data.btnStart.oBtn.getClientRects()[0].x;
 
 		this.$data.btnEnd.oBtn = this.$el.querySelector('.slider__btn-end');
 		this.$data.btnEnd.oSliderCount = this.$el.querySelector('.slider__count-end');
 		this.$data.btnEnd.dBtn = parseInt(getComputedStyle(this.$data.btnEnd.oBtn).width, 10)/2;
 		//this.$data.btnEnd.styleObj.left = "225px";
-		this.$data.btnEnd.xClient = this.$el.getClientRects()[0].x;
+		this.$data.btnEnd.xClient = this.$data.btnStart.oBtn.getClientRects()[0].x;
 		this.$data.btnEnd.cClient = this.$data.btnEnd.oBtn.getClientRects()[0].x;
-		this.$data.btnEnd.dClient = this.params.interval/*this.$data.btnEnd.cClient - this.$data.btnEnd.xClient*/;	
+		this.$data.btnEnd.dClient = this.params.interval/*this.$data.btnEnd.cClient - this.$data.btnEnd.xClient*/;		
 
-		this._setMoveParams('btnEnd', this.params.interval);
+		this._setSliderParams("btnEnd", this.params.interval);	
+		/*this.params.dateStart = this.btnStart.date;
+		this.params.dateEnd = this.btnEnd.date;*/
 
 		console.log("Mounted");
 	},
 	methods: {
-		sliderMDown(btn, e) {
-
-			var that = this;
-			var coords = this._getCoords(this[btn].oBtn);
-			var pageX = this._getPageX(e);			
-			this[btn].dBtn = pageX - coords.left;
+		sliderMDown(btn) {
+			this.moveEventFlag = true;
 			this.btnFlag = btn;
-			console.log("DELTA BTN", this[btn].dBtn);
-			console.log("DELTA BTN x", pageX);
-			console.log("DELTA BTN l", coords.left);
-			
-			this._moveAt.call(this, e);
-			
-			document.onmousemove = function(e) {
-				that._moveAt.call(that, e);
-			}
-			document.ontouchmove = function(e) {
-				that._moveAt.call(that, e);
-			}
-			
-		},
-		_moveAt(e) {
-			var btn = this.btnFlag;
-			
-			var pageX = this._getPageX(e);					
-			this[btn].dClient = pageX - this.$el.getClientRects()[0].x;
-			//this[btn].dClient -= this[btn].dBtn;			
-
-			this._setMoveParams(btn, this[btn].dClient);
-		},
-		_setMoveParams(btn, interval) {
-			var timeMs;
-
-			this[btn].styleObj.left = interval - this[btn].dBtn + 'px';
-			var left = parseInt(this[btn].styleObj.left, 10);
-
-			if (btn === 'btnStart') {
-				timeMs = this[btn].startMs + (interval) * 60 * 1000;
-				this.params.dateStart = new Date(timeMs).setSeconds(0);
-			} else {
-				timeMs = this[btn].startMs - (240 - interval) * 60 * 1000;
-				this.params.dateEnd = new Date(timeMs).setSeconds(0);
-			}
-
-			this[btn].date.setTime(timeMs);
-			this[btn].oSliderCount = this[btn].date.toLocaleString().split(" ")[1].substr(0,5);
-
-			var cBgLineWidth = this.btnEnd.dClient - this.btnStart.dClient;				
-			this.bgLineStyle.width = cBgLineWidth + "px";
-			this.bgLineStyle.left = this.btnStart.dClient + "px";
-			this.params.interval = cBgLineWidth;
-
-		},
-		_getPageX(e) {
-			if (e.changedTouches) {
-				return e.changedTouches[0].pageX;
-			} else {
-				return e.pageX;	
-			}		
+			//this[this.btnFlag].xClient === 0 && (this[this.btnFlag].xClient = this["btnStart"].oBtn.getClientRects()[0].x);
 		},
 		sliderMUp(btn) {
-
-			document.onmousemove = null;
-			document.ontouchmove = null;
-			
+			this.moveEventFlag = false;
 			this.btnFlag = btn;
 		},
-		_getCoords(el) {
-			var box = el.getBoundingClientRect();
-			return {
-				top: box.top + pageYOffset,
-				left: box.left + pageXOffset
-			};
+		sliderMLeave(btn) {
+			this.moveEventFlag = false;
+			this.btnFlag = btn;
+		},
+		sliderMMove: function(e) {
+			if (!this.moveEventFlag) return;					
+				
+				var microDelta = -this[this.btnFlag].dBtn;
+				var max = parseInt(getComputedStyle(this.$el).width, 10);
+				var dClient;
+
+				if (e.changedTouches) {
+					this[this.btnFlag].cClient = e.changedTouches[0].clientX;
+				} else {
+					this[this.btnFlag].cClient = e.clientX;	
+				}
+
+				dClient = this[this.btnFlag].cClient - this[this.btnFlag].xClient;
+			
+				this._setSliderParams(this.btnFlag, dClient);				
+			
+		},
+		_setSliderParams(btnFlag, dClient) {
+
+			var microDelta = -this[btnFlag].dBtn;
+				//this["btnEnd"].dClient = 180;
+				this[btnFlag].dClient = dClient;
+			/*Расчет положения кнопки начала и конца периода*/
+				if (this[btnFlag].dClient < 0) {
+					this[btnFlag].dClient = 0;
+					this[btnFlag].styleObj.left = "-" + this[btnFlag].dBtn + "px";
+				} else if (this[btnFlag].dClient >= 240) {
+					this[btnFlag].dClient = 240;
+					this[btnFlag].styleObj.left = "225px";
+				} else {
+					this[btnFlag].styleObj.left = this[btnFlag].dClient + microDelta + "px";
+				}
+
+			/*Расчет начальной и конечной даты*/
+				if (btnFlag === 'btnStart') {
+					timeMs = this[btnFlag].startMs + this[btnFlag].dClient * 60 * 1000;
+				} else {
+					timeMs = this[btnFlag].startMs - (240 - this[btnFlag].dClient) * 60 * 1000;
+				}
+
+				this[btnFlag].date.setTime(timeMs);
+				this[btnFlag].oSliderCount = this[btnFlag].date.toLocaleString().split(" ")[1].substr(0,5);
+
+			/*Расчет ширины и смещения влево задней полосы прокрутки*/
+				var cBgLineWidth = this.btnEnd.dClient - this.btnStart.dClient;				
+				this.bgLineStyle.width = cBgLineWidth + "px";
+				this.bgLineStyle.left = this.btnStart.dClient + "px";
+				this.params.interval = cBgLineWidth;	
 		}
 	},
 	template: `
-		<div class="slider">
+		<div class="slider" v-on:mousemove="sliderMMove"
+							v-on:touchmove="sliderMMove">
 		<div class="slider__count">{{ btnStart.date.toLocaleString().split(" ")[1].substr(0,5) }}</div>
 		<div class="slider__count-end">{{ btnEnd.date.toLocaleString().split(" ")[1].substr(0,5) }}</div>
 		<div class="slider__bg-line--out"></div>
 		<div class="slider__bg-line" v-bind:style="bgLineStyle"></div>		
 		<button class="slider__btn" v-bind:style="btnStart.styleObj"
-				v-on:mousedown="sliderMDown('btnStart', $event)"
-				v-on:mouseup="sliderMUp('btnStart', $event)"
-				v-on:dragstart.prevent
-				v-on:touchstart="sliderMDown('btnStart', $event)"
-				v-on:touchend="sliderMUp('btnStart', $event)"
-				v-on:touchcancel="sliderMLeave('btnStart', $event)"></button>
+				v-on:mousedown="sliderMDown('btnStart')"
+				v-on:mouseup="sliderMUp('btnStart')"
+				v-on:mouseleave="sliderMLeave('btnStart')"
+				v-on:touchstart="sliderMDown('btnStart')"
+				v-on:touchend="sliderMUp('btnStart')"
+				v-on:touchcancel="sliderMLeave('btnStart')"></button>
 		<button class="slider__btn-end" v-bind:style="btnEnd.styleObj"
-				v-on:mousedown="sliderMDown('btnEnd', $event)"
-				v-on:mouseup="sliderMUp('btnEnd', $event)"
-				v-on:dragstart.prevent
-				v-on:touchstart="sliderMDown('btnEnd', $event)"
-				v-on:touchend="sliderMUp('btnEnd', $event)"
-				v-on:touchcancel="sliderMLeave('btnEnd', $event)"></button>
-		<div class="slider__user-name">{{ params.name }}</div>		
-		<div class="slider__user-sum" :class="{'hide': params.sum === 0}">
-			<span class="user-sum__text">{{ params.sum }}</span>
-			<span class="user-sum__text-rub">&#8381</span>
-		</div>
+				v-on:mousedown="sliderMDown('btnEnd')"
+				v-on:mouseup="sliderMUp('btnEnd')"
+				v-on:mouseleave="sliderMLeave('btnEnd')"
+				v-on:touchstart="sliderMDown('btnEnd')"
+				v-on:touchend="sliderMUp('btnEnd')"
+				v-on:touchcancel="sliderMLeave('btnEnd')"></button>
+		<div class="slider__user-name">{{ params.name }}</div>
 	</div>`
 });
 
@@ -272,19 +255,10 @@ let vm = new Vue({
 		sum: 0,
 		countPeople: 0,
 		oHour: {},
-		hourPrice: 1250,
+		costOneH: 1250,
 		peopleFlagShow: false,
 		localhost: window.location.hostname === "localhost",
-		newPeopleFlagShow: false,
-		statuses: {
-			0: 'Всех подвел',
-			59: 'Ниочем вообще',
-			60: 'Дрищавый хлюпик',
-			120: 'Славный парниша',
-			180: 'Настоящий мужик',
-			240: 'Банщик',
-			300: 'Банщик-йог'
-		}
+		newPeopleFlagShow: false
 	},
 	methods: {
 		toggleNewUserForm() {
@@ -368,7 +342,7 @@ let vm = new Vue({
 			});
 			//return this.oHour;
 		},
-		getOrderOld() {
+		getOrder() {
 			var that = this;
 			console.log("START ORDER", this.oHour);
 			var allHours = Object.keys(this.oHour).length;
@@ -409,97 +383,7 @@ let vm = new Vue({
 			/*изменение модели с итоговыми данными*/
 
 		},
-		getOrder() {
-			var minDate, maxDate, aMinDates = [], aMaxDates = [], curPeoples = {};
-			var hourPrice = this.hourPrice;
-			for (var user in this.peoples) {
-				/*Обнуляем итоговое значение суммы*/
-				peoples[user].sum = 0;
-				peoples[user].idx > -1 && (curPeoples[user] = peoples[user]);
-				peoples[user].idx > -1 && aMinDates.push(peoples[user].dateStart);
-				peoples[user].idx > -1 && aMaxDates.push(peoples[user].dateEnd);
-			}
-			minDate = Math.min(...aMinDates);
-			maxDate = Math.max(...aMaxDates);
-
-			var H2000 = new Date().setHours(20,0,0);
-			aMinDates.push(parseInt(H2000.toString().substr(0,9) + "0000", 10));
-			/*var H2100 = new Date().setHours(21,0,0);
-			aMinDates.push(parseInt(H2100.toString().substr(0,9) + "0000", 10));
-			var H2200 = new Date().setHours(22,0,0);
-			aMinDates.push(parseInt(H2200.toString().substr(0,9) + "0000", 10));			*/
-
-			/*Адская хрень*/
-			var aAllDates = [...new Set([...new Set(aMinDates.sort()), ...new Set(aMaxDates.sort())].sort())];
-
-			var p = {};
-			var prop = 1;
-			var sum = {};
-			var result = 0;
-
-			aAllDates.forEach(function(dateStart, i, arr) {
-				p[i] = [];
-
-				//if (i === 0) continue;
-				for (var id in curPeoples) {
-					var user = curPeoples[id];
-					if (i !== 0 && user.dateStart < dateStart && user.dateEnd >= dateStart) {
-						p[i].push(user.id);
-					}
-				}
-
-				if (i > 0) {
-
-					sum[i] = {
-						users: p[i], 
-						min: hourPrice/p[i].length/60, 
-						period: Math.ceil((dateStart-arr[i-1])/1000/60)
-					};
-
-					for (var id in curPeoples) {
-						var user = curPeoples[id];
-						if (~p[i].indexOf(user.id)) {
-							user.sum += Math.ceil(sum[i].period * sum[i].min);
-						}
-					}
-
-					
-					var cSum = sum[i].period * sum[i].min * sum[i].users.length;
-					console.log("SUM", i, sum[i]);
-					console.log("SUM for period", cSum);
-					result += cSum;
-				} 
-
-				/*if (dateStart === H2100) {
-						
-				}*/
-			});
-			console.log("Results", result);
-			var trueResult = 0;
-			for (var id in curPeoples) {
-				var user = curPeoples[id];
-				trueResult += user.sum;
-				
-			}
-			console.log("Results true", trueResult);
-			this.sum = result;
-			//var periods = new Set(aMinDates.sort());
-			//console.log("Period start", periods);
-			
-			/*var user;
-			for (var i = minDate; i <= maxDate; i = i + 60000) {
-
-				for (var id in this.peoples) {
-					user = peoples[user];
-					if (i >= user.dateStart && i <= user.dateEnd && user.idx > -1) {
-						//console.log(user.name);
-
-
-					}
-				}
-			}*/
-		},
-		getClearOld() {
+		getClear() {
 			var that = this;
 			this.oHour = {};
 			this.sum = 0;
@@ -513,18 +397,6 @@ let vm = new Vue({
 				});
 
 			});
-		},
-		getClear() {
-			var that = this;
-			var user;
-			this.oHour = {};
-			this.sum = 0;
-			/*var oHour = this.oHour;*/
-
-			for (var id in this.peoples) {
-				user = this.peoples[id];
-				user.sum = 0;
-			}
 		},
 		setAll(i) {
 			var row = this.rows[i];
@@ -543,29 +415,12 @@ let vm = new Vue({
 				}
 			});
 			this.getHours();
-		},
-		getStatus(interval) {
-			if (interval <= 0) {
-				return this.statuses[0]
-			} else if (interval > 0 && interval < 60) {
-				return this.statuses[59];
-			} else if (interval >= 60 && interval < 120) {
-				return this.statuses[60];
-			} else if (interval >= 120 && interval < 180) {
-				return this.statuses[120];
-			} else if (interval >= 180 && interval < 240) {
-				return this.statuses[180];
-			} else if (interval >= 240 && interval < 300) {
-				return this.statuses[240];
-			} else if (interval >= 300) {
-				return this.statuses[300];
-			}
 		}
-	},	
+	},
 	filters: {
 		getCeil: function(num) {
 			return Math.ceil(num);
-		}		
+		}
 	}
 });
 
