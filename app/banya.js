@@ -198,10 +198,10 @@ Vue.component('app-slider', {
 
 			if (btn === 'btnStart') {
 				timeMs = this[btn].startMs + (interval) * 60 * 1000;
-				this.params.dateStart = new Date(timeMs).setSeconds(0);
+				this.params.dateStart = new Date(parseInt(timeMs.toString().substr(0,9) + "0000", 10)).setSeconds(0);
 			} else {
 				timeMs = this[btn].startMs - (240 - interval) * 60 * 1000;
-				this.params.dateEnd = new Date(timeMs).setSeconds(0);
+				this.params.dateEnd = new Date(parseInt(timeMs.toString().substr(0,9) + "0000", 10)).setSeconds(0);
 			}
 
 			this[btn].date.setTime(timeMs);
@@ -274,7 +274,7 @@ let vm = new Vue({
 		oHour: {},
 		hourPrice: 1250,
 		peopleFlagShow: false,
-		localhost: /*window.location.hostname === "localhost"*/true,
+		localhost: window.location.hostname === "localhost",
 		newPeopleFlagShow: false,
 		statuses: {
 			0: 'Всех подвел',

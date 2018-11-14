@@ -4,7 +4,8 @@
 .bg-title {
 	display: inline;
 	font-size: 50px;
-	color: #000;
+	/* color: #000; */
+	color: #9e4545;
 }
 .front-title {
 	display: inline;
