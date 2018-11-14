@@ -274,7 +274,7 @@ let vm = new Vue({
 		oHour: {},
 		hourPrice: 1250,
 		peopleFlagShow: false,
-		localhost: window.location.hostname === "localhost",
+		localhost: /*window.location.hostname === "localhost"*/true,
 		newPeopleFlagShow: false,
 		statuses: {
 			0: 'Всех подвел',
