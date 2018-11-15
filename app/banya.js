@@ -24,7 +24,7 @@ const titles = ["Имя", "20:00 - 21:00", "21:00 - 22:00", "22:00 - 23:00", "23
 	{name: "Dmitry", hourPrice: ["Dmitry",false, false, false, false, 0], start: "20:00", end: "24:00"}
 ];*/
 
-let rows = [
+/*let rows = [
 	["Ilya",false, false, false, false, 0],  
 	["Ivan",false, false, false, false, 0],
 	["Dmitry",false, false, false, false, 0],
@@ -34,19 +34,19 @@ let rows = [
 	["Oleg",false, false, false, false, 0],
 	["Dmitry A.",false, false, false, false, 0]
 ];
-
+*/
 const peoplesData = ["Ставровский Илья", "Гордеев Иван", "Прохоров Дмитрий", "Казанцев Николай", "Пустовойт Андрей", "Авсянкин Дмитрий", "Николаев Евгений", "Николаев Илья"].sort();
 
 function People(oParams) {
-	var d1 = new Date().setHours(20, 0, 0);
-	var d2 = new Date().setHours(24, 0, 0);
+	//var d1 = new Date().setHours(20, 0, 0, 0);
+	//var d2 = new Date().setHours(24, 0, 0, 0);
 	this.name = oParams.name;
 	this.id = oParams.id;
 	this.row = oParams.row || [oParams.id, false, false, false, false, 0];
 	this.checked = oParams.checked || false;
 	this.idx = oParams.idx || -1;
-	this.dateStart = parseInt(d1.toString().substr(0,9) + "0000", 10)/*new Date().setHours(20, 0, 0)*/;
-	this.dateEnd = parseInt(d2.toString().substr(0,9) + "0000", 10)/*new Date().setHours(24, 0, 0)*/;
+	this.dateStart = /*parseInt(d1.toString().substr(0,9) + "0000", 10)*/new Date().setHours(20, 0, 0, 0);
+	this.dateEnd = /*parseInt(d2.toString().substr(0,9) + "0000", 10)*/new Date().setHours(24, 0, 0, 0);
 	this.interval = (this.dateEnd - this.dateStart)/1000/60 - 60 // в минутах;
 	this.sum = 0;
 }
@@ -198,10 +198,10 @@ Vue.component('app-slider', {
 
 			if (btn === 'btnStart') {
 				timeMs = this[btn].startMs + (interval) * 60 * 1000;
-				this.params.dateStart = new Date(parseInt(timeMs.toString().substr(0,9) + "0000", 10)).setSeconds(0);
+				this.params.dateStart = /*new Date(parseInt(timeMs.toString().substr(0,9) + "0000", 10))*/new Date(timeMs).setSeconds(0, 0);
 			} else {
 				timeMs = this[btn].startMs - (240 - interval) * 60 * 1000;
-				this.params.dateEnd = new Date(parseInt(timeMs.toString().substr(0,9) + "0000", 10)).setSeconds(0);
+				this.params.dateEnd = /*new Date(parseInt(timeMs.toString().substr(0,9) + "0000", 10))*/new Date(timeMs).setSeconds(0, 0);
 			}
 
 			this[btn].date.setTime(timeMs);
@@ -233,10 +233,20 @@ Vue.component('app-slider', {
 				top: box.top + pageYOffset,
 				left: box.left + pageXOffset
 			};
+		},
+		onLeftArrowClick(btn) {
+			this[btn].dClient = this[btn].dClient - 1;
+			this._setMoveParams(btn, this[btn].dClient);
+		}
+		,
+		onRightArrowClick(btn) {
+			//this[btn].dBtn = 0;
+			this[btn].dClient = this[btn].dClient + 1;
+			this._setMoveParams(btn, this[btn].dClient);
 		}
 	},
 	template: `
-		<div class="slider">
+	<div class="slider">
 		<div class="slider__count">{{ btnStart.date.toLocaleString().split(" ")[1].substr(0,5) }}</div>
 		<div class="slider__count-end">{{ btnEnd.date.toLocaleString().split(" ")[1].substr(0,5) }}</div>
 		<div class="slider__bg-line--out"></div>
@@ -259,6 +269,28 @@ Vue.component('app-slider', {
 		<div class="slider__user-sum" :class="{'hide': params.sum === 0}">
 			<span class="user-sum__text">{{ params.sum }}</span>
 			<span class="user-sum__text-rub">&#8381</span>
+		</div>
+		<div class="slider__panel">
+			<div class="slider__panel__start">
+				<div class="left-arrow__section" v-on:click="onLeftArrowClick('btnStart')"
+										v-on:tap="onLeftArrowClick('btnStart')">
+										<span class="arrow">&#9001</span>
+										</div>
+				<div class="right-arrow__section" v-on:click="onRightArrowClick('btnStart')"
+										v-on:tap="onRightArrowClick('btnStart')">
+										<span class="arrow">&#9002</span>
+										</div>
+			</div>
+			<div class="slider__panel__end">
+				<div class="left-arrow__section" v-on:click="onLeftArrowClick('btnEnd')"
+										v-on:tap="onLeftArrowClick('btnEnd')">
+										<span class="arrow">&#9001</span>
+										</div>
+				<div class="right-arrow__section" v-on:click="onRightArrowClick('btnEnd')"
+										v-on:tap="onRightArrowClick('btnEnd')">
+										<span class="arrow">&#9002</span>
+										</div>
+			</div>
 		</div>
 	</div>`
 });
@@ -313,19 +345,22 @@ let vm = new Vue({
 			}
 		},
 		// Добавление пользователей из списка в таблицу расчетов
-		addPeople(id) {
-			if (!id.checked) {
-				this.rows.push(id.row);
-				id.idx = this.rows.length - 1;
+		addPeople(user) {
+			if (!user.checked) {
+				this.rows.push(user.id);
+				user.idx = this.rows.length - 1;
 				this.countPeople++;
 			} else {
-				this._setNewIdxs(id.idx);
-				this.rows.splice(id.idx, 1);
-				id.idx = -1;
+				this._setNewIdxs(user.idx);
+				this.rows.splice(user.idx, 1);
+				user.idx = -1;
+				user.dateStart = new Date().setHours(20,0,0,0);
+				user.dateEnd = new Date().setHours(24,0,0,0);
+				user.interval = (user.dateEnd - user.dateStart)/1000/60 - 60
 				this.countPeople--;
 			}
 
-			id.checked = !id.checked;			
+			user.checked = !user.checked;			
 			
 		},
 		_setNewIdxs(idx) {
@@ -422,8 +457,8 @@ let vm = new Vue({
 			minDate = Math.min(...aMinDates);
 			maxDate = Math.max(...aMaxDates);
 
-			var H2000 = new Date().setHours(20,0,0);
-			aMinDates.push(parseInt(H2000.toString().substr(0,9) + "0000", 10));
+			var H2000 = new Date().setHours(20,0,0,0);
+			aMinDates.push(H2000);
 			/*var H2100 = new Date().setHours(21,0,0);
 			aMinDates.push(parseInt(H2100.toString().substr(0,9) + "0000", 10));
 			var H2200 = new Date().setHours(22,0,0);
@@ -449,17 +484,29 @@ let vm = new Vue({
 				}
 
 				if (i > 0) {
+					var min;
+					if (p[i].length === 0) {
+						min = 0;
+					} else {
+						min = hourPrice/p[i].length/60;
+					}
 
 					sum[i] = {
 						users: p[i], 
-						min: hourPrice/p[i].length/60, 
-						period: Math.ceil((dateStart-arr[i-1])/1000/60)
+						min: min, 
+						period: Math.ceil((dateStart-arr[i-1])/1000/60) < 0 ? 0 : Math.ceil((dateStart-arr[i-1])/1000/60)
 					};
 
 					for (var id in curPeoples) {
 						var user = curPeoples[id];
 						if (~p[i].indexOf(user.id)) {
-							user.sum += Math.ceil(sum[i].period * sum[i].min);
+
+							if (sum[i].period < 0) {
+								user.sum = 0;	
+							} else {
+								user.sum += Math.ceil(sum[i].period * sum[i].min);
+							}
+							
 						}
 					}
 
@@ -482,7 +529,7 @@ let vm = new Vue({
 				
 			}
 			console.log("Results true", trueResult);
-			this.sum = result;
+			this.sum = Math.round(result);
 			//var periods = new Set(aMinDates.sort());
 			//console.log("Period start", periods);
 			
@@ -523,7 +570,7 @@ let vm = new Vue({
 
 			for (var id in this.peoples) {
 				user = this.peoples[id];
-				user.sum = 0;
+				user.sum = 0;				
 			}
 		},
 		setAll(i) {
