@@ -109,7 +109,7 @@
 	<div :class="{'hide': !!!sum}" v-for="user in peoples">
 		<div v-if="~user.idx" class="results__row">
 			<div class="results__cell-name">{{user.name}}</div>
-			<div class="results__cell-sum">{{user.sum}}</div>
+			<div class="results__cell-sum">{{Math.ceil(user.sum)}}</div>
 			<div class="results__cell-rub">
 				<span class="rub">&#8381</span>
 			</div>

@@ -504,7 +504,8 @@ let vm = new Vue({
 							if (sum[i].period < 0) {
 								user.sum = 0;	
 							} else {
-								user.sum += Math.ceil(sum[i].period * sum[i].min);
+								//user.sum += Math.ceil(sum[i].period * sum[i].min);
+								user.sum += sum[i].period * sum[i].min;
 							}
 							
 						}
