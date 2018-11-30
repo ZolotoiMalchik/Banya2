@@ -347,12 +347,14 @@ let vm = new Vue({
 		// Добавление пользователей из списка в таблицу расчетов
 		addPeople(user) {
 			if (!user.checked) {
-				this.rows.push(user.id);
+				//this.rows.push(user.id);
+				Vue.set(this.rows, this.rows.length - 1, user.id);
 				user.idx = this.rows.length - 1;
 				this.countPeople++;
 			} else {
 				this._setNewIdxs(user.idx);
-				this.rows.splice(user.idx, 1);
+				//this.rows.splice(user.idx, 1);
+				Vue.set(this.rows, user.idx, false);
 				user.idx = -1;
 				user.dateStart = new Date().setHours(20,0,0,0);
 				user.dateEnd = new Date().setHours(24,0,0,0);
