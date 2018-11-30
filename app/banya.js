@@ -348,7 +348,7 @@ let vm = new Vue({
 		addPeople(user) {
 			if (!user.checked) {
 				//this.rows.push(user.id);
-				Vue.set(this.rows, this.rows.length - 1, user.id);
+				Vue.set(this.rows, this.rows.length - 1 > 0 ? this.rows.length - 1 > 0 : this.rows.length, user.id);
 				user.idx = this.rows.length - 1;
 				this.countPeople++;
 			} else {
